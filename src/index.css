@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* LIGHT THEME SYSTEM OVERRIDES */
+.theme-light {
+  background-color: #f8fafc !important; /* slate-50 */
+  color: #0f172a !important; /* slate-900 */
+}
+
+/* Outer background of views */
+.theme-light .bg-slate-950,
+.theme-light .min-h-screen.bg-slate-950,
+.theme-light div.bg-slate-950 {
+  background-color: #f1f5f9 !important; /* slate-100 */
+}
+
+/* Card panels / inner sheets */
+.theme-light .bg-slate-900,
+.theme-light .bg-slate-900\/60,
+.theme-light .bg-slate-900\/70,
+.theme-light .bg-slate-900\/80,
+.theme-light .bg-slate-900\/40,
+.theme-light .bg-slate-900\/50,
+.theme-light .bg-slate-950\/60,
+.theme-light .bg-slate-950\/40,
+.theme-light .bg-slate-950\/30,
+.theme-light .bg-slate-950\/80 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important; /* slate-300 */
+}
+
+/* Sub-panels and inner buttons */
+.theme-light .bg-slate-955,
+.theme-light .bg-slate-850,
+.theme-light .bg-slate-800,
+.theme-light .bg-slate-800\/60,
+.theme-light .bg-slate-800\/80,
+.theme-light select {
+  background-color: #f1f5f9 !important; /* slate-100 */
+  border-color: #cbd5e1 !important; /* slate-300 */
+  color: #0f172a !important;
+}
+
+/* Hover state overrides */
+.theme-light .hover\:bg-slate-850:hover,
+.theme-light .hover\:bg-slate-800:hover,
+.theme-light .hover\:bg-slate-900:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Primary text headings */
+.theme-light .text-white,
+.theme-light .text-slate-100,
+.theme-light .text-slate-200,
+.theme-light h1,
+.theme-light h2,
+.theme-light h3,
+.theme-light h4 {
+  color: #0f172a !important; /* slate-900 */
+}
+
+/* Subtext & Labels */
+.theme-light .text-slate-300,
+.theme-light .text-slate-400 {
+  color: #475569 !important; /* slate-600 */
+}
+
+.theme-light .text-slate-500 {
+  color: #64748b !important; /* slate-500 */
+}
+
+/* Specific text emerald accents */
+.theme-light .text-emerald-400 {
+  color: #059669 !important; /* emerald-600 */
+}
+.theme-light .text-emerald-300 {
+  color: #047857 !important; /* emerald-700 */
+}
+
+/* Green badge / background pills */
+.theme-light .bg-emerald-950\/80,
+.theme-light .bg-emerald-950\/45,
+.theme-light .bg-emerald-950\/40,
+.theme-light .bg-emerald-950 {
+  background-color: #ecfdf5 !important; /* emerald-50 */
+  color: #047857 !important; /* emerald-700 */
+  border-color: #a7f3d0 !important; /* emerald-200 */
+}
+
+/* Red / Danger overrides */
+.theme-light .text-red-400 {
+  color: #dc2626 !important; /* red-600 */
+}
+.theme-light .bg-red-950\/40,
+.theme-light .bg-red-950\/50,
+.theme-light .bg-red-950\/60 {
+  background-color: #fef2f2 !important; /* red-50 */
+  color: #b91c1c !important; /* red-700 */
+  border-color: #fca5a5 !important; /* red-200 */
+}
+
+/* Custom styles for inputs */
+.theme-light input,
+.theme-light textarea,
+.theme-light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+/* Border overrides */
+.theme-light .border-slate-850,
+.theme-light .border-slate-800,
+.theme-light .border-slate-800\/60,
+.theme-light .border-slate-800\/40,
+.theme-light .border-emerald-900\/30,
+.theme-light .border-emerald-800\/40 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Gradients */
+.theme-light .from-emerald-950\/80 {
+  --tw-gradient-from: #d1fae5 !important; /* emerald-100 */
+}
+.theme-light .to-slate-950 {
+  --tw-gradient-to: #f1f5f9 !important; /* slate-100 */
+}
+.theme-light .bg-gradient-to-b.from-emerald-950\/80.to-slate-950 {
+  background-image: linear-gradient(to bottom, #ecfdf5, #f8fafc) !important;
+}
+.theme-light .bg-gradient-to-r.from-emerald-950\/80.to-slate-900,
+.theme-light .bg-gradient-to-r.from-emerald-950\/65.to-slate-900 {
+  background-image: linear-gradient(to right, #ecfdf5, #ffffff) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Bottom Nav bar background */
+.theme-light .bg-slate-900,
+.theme-light .bg-slate-900\/90 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Lock overlay */
+.theme-light .bg-black\/80,
+.theme-light .bg-black\/85 {
+  background-color: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* SPLASH SCREEN KEYFRAMES */
+@keyframes progressAnim {
+  0% { width: 0%; }
+  40% { width: 45%; }
+  75% { width: 85%; }
+  100% { width: 100%; }
+}
+
+.animate-progress-bar {
+  animation: progressAnim 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+

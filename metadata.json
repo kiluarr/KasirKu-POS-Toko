@@ -1,0 +1,8 @@
+{
+  "name": "Copy of KasirPro Professional POS",
+  "description": "A professional offline-first POS with real-time analytics, inventory management, and digital receipt generation for modern retail businesses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
