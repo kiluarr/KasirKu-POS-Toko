@@ -12,7 +12,9 @@ import {
   ScanLine,
   X,
   Sparkles,
-  ShoppingBag
+  ShoppingBag,
+  Copy,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Product, CartItem, PaymentMethod, Transaction, StoreSettings } from '../types';
@@ -42,6 +44,8 @@ export default function KasirView({ settings }: KasirViewProps) {
 
   // Success Modal & Receipt
   const [showReceipt, setShowReceipt] = useState(false);
+  const [showTransferPopup, setShowTransferPopup] = useState(false);
+  const [copiedField, setCopiedField] = useState<'total' | 'account' | null>(null);
   const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null);
 
   // Barcode / Scanner simulation state
@@ -225,9 +229,13 @@ export default function KasirView({ settings }: KasirViewProps) {
         origin: { y: 0.6 }
       });
 
-      // 4. Open Receipt view
+      // 4. Open Receipt view or show Transfer Instructions Info Popup
       setActiveTransaction(transaction);
-      setShowReceipt(true);
+      if (paymentMethod === 'CASH') {
+        setShowReceipt(true);
+      } else {
+        setShowTransferPopup(true);
+      }
       setIsCheckoutOpen(false);
 
       // Reset cart and checkout values
@@ -263,6 +271,56 @@ export default function KasirView({ settings }: KasirViewProps) {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(num).replace('Rp', settings.currency);
+  };
+
+  const renderDeterministicQR = (text: string) => {
+    const size = 15;
+    const grid = [];
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    for (let r = 0; r < size; r++) {
+      const row = [];
+      for (let c = 0; c < size; c++) {
+        const isFinderTopLeft = r < 5 && c < 5;
+        const isFinderTopRight = r < 5 && c >= size - 5;
+        const isFinderBottomLeft = r >= size - 5 && c < 5;
+
+        if (isFinderTopLeft || isFinderTopRight || isFinderBottomLeft) {
+          const innerR = r === 0 || r === 4 || c === 0 || c === 4 || (r === 2 && c === 2);
+          const innerR_TR = r === 0 || r === 4 || c === size - 1 || c === size - 5 || (r === 2 && c === size - 3);
+          const innerR_BL = r === size - 1 || r === size - 5 || c === 0 || c === 4 || (r === size - 3 && c === 2);
+          
+          if (isFinderTopLeft) row.push(innerR || (r >= 1 && r <= 3 && c >= 1 && c <= 3 && !(r === 2 && c === 2) === false));
+          else if (isFinderTopRight) row.push(innerR_TR || (r >= 1 && r <= 3 && c >= size - 4 && c <= size - 2 && !(r === 2 && c === size - 3) === false));
+          else row.push(innerR_BL || (r >= size - 4 && r <= size - 2 && c >= 1 && c <= 3 && !(r === size - 3 && c === 2) === false));
+        } else {
+          const bitIndex = r * size + c;
+          const val = ((hash >> (bitIndex % 32)) & 1) === 1;
+          row.push(val);
+        }
+      }
+      grid.push(row);
+    }
+
+    return (
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-32 h-32 mx-auto border p-1 bg-white rounded-lg shadow-inner">
+        {grid.map((row, rIdx) =>
+          row.map((active, cIdx) => (
+            <rect
+              key={`${rIdx}-${cIdx}`}
+              x={cIdx}
+              y={rIdx}
+              width="1.05"
+              height="1.05"
+              fill={active ? '#000000' : '#FFFFFF'}
+            />
+          ))
+        )}
+      </svg>
+    );
   };
 
   return (
@@ -745,6 +803,141 @@ export default function KasirView({ settings }: KasirViewProps) {
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer Payment Instructions Info Popup */}
+      {showTransferPopup && activeTransaction && (
+        <div className="fixed inset-0 z-[90] bg-black/85 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in animate-duration-200">
+          <div className="bg-slate-900 border border-emerald-800/40 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+            <div className="px-5 py-4 border-b border-emerald-950/50 bg-emerald-950/20 flex items-center justify-between">
+              <h3 className="font-bold text-emerald-400 text-sm flex items-center gap-2">
+                <QrCode className="w-4.5 h-4.5 text-emerald-400" />
+                Instruksi Pembayaran Non-Tunai
+              </h3>
+              <button
+                onClick={() => {
+                  setShowTransferPopup(false);
+                  setShowReceipt(true);
+                }}
+                className="p-1 rounded bg-slate-850 text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5 text-center">
+              <div className="space-y-1">
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Total Tagihan</span>
+                <div className="flex items-center justify-center gap-2">
+                  <h4 className="text-3xl font-black text-emerald-400">{formatNum(activeTransaction.total)}</h4>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(activeTransaction.total.toString());
+                      setCopiedField('total');
+                      setTimeout(() => setCopiedField(null), 2000);
+                    }}
+                    className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white active:bg-slate-700 transition-colors cursor-pointer"
+                    title="Salin nominal"
+                  >
+                    {copiedField === 'total' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+                {copiedField === 'total' && (
+                  <span className="text-[10px] text-emerald-400 font-bold block animate-pulse">Nominal disalin!</span>
+                )}
+              </div>
+
+              {activeTransaction.paymentMethod === 'QRIS' ? (
+                <div className="bg-slate-950/80 border border-slate-850 p-5 rounded-2xl space-y-4">
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">QRIS Dinamis</span>
+                  <div className="flex justify-center">
+                    {renderDeterministicQR(activeTransaction.invoiceNumber)}
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="text-xs font-black text-white">Scan QRIS untuk membayar</p>
+                    <p className="text-[10px] text-slate-400">Pindai kode QR di atas melalui aplikasi m-banking atau e-wallet (GoPay, OVO, Dana, dll.)</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-slate-950/80 border border-slate-850 p-5 rounded-2xl space-y-4 text-left">
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-850">
+                    <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Metode Pembayaran</span>
+                    <span className="px-2.5 py-1 bg-emerald-950/50 border border-emerald-800/40 text-emerald-400 rounded-lg text-[10px] font-black uppercase">
+                      {activeTransaction.paymentMethod === 'TRANSFER' ? 'Transfer Bank' : 'E-Wallet'}
+                    </span>
+                  </div>
+
+                  {activeTransaction.paymentRecipient ? (
+                    <div className="space-y-3 pt-1">
+                      <div>
+                        <span className="text-[10px] text-slate-500 font-semibold uppercase block">Penyedia / Bank</span>
+                        <p className="text-sm font-black text-white">{activeTransaction.paymentRecipient.providerName}</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-slate-500 font-semibold uppercase block">Nomor Rekening / HP</span>
+                        <div className="flex items-center justify-between bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl">
+                          <span className="text-sm font-mono font-black text-white select-all">
+                            {activeTransaction.paymentRecipient.accountNumber}
+                          </span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(activeTransaction.paymentRecipient?.accountNumber || '');
+                              setCopiedField('account');
+                              setTimeout(() => setCopiedField(null), 2000);
+                            }}
+                            className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white active:bg-slate-700 transition-colors cursor-pointer"
+                            title="Salin nomor"
+                          >
+                            {copiedField === 'account' ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                        {copiedField === 'account' && (
+                          <span className="text-[10px] text-emerald-400 font-bold block text-right animate-pulse">Nomor rekening disalin!</span>
+                        )}
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] text-slate-500 font-semibold uppercase block">Nama Pemilik Rekening</span>
+                        <p className="text-xs font-bold text-slate-200">a.n. {activeTransaction.paymentRecipient.accountName}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-2">
+                      <p className="text-xs text-red-400">⚠️ Rekening penerima tidak terpilih atau tidak diatur.</p>
+                      <p className="text-[10px] text-slate-500 mt-1">Gunakan detail transfer manual atau atur di menu Pengaturan.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-xl text-left">
+                <p className="text-[10px] text-slate-300 leading-normal">
+                  💡 <strong>Tip Kasir:</strong> Tunjukkan detail di atas kepada pelanggan untuk menyelesaikan transfer. Setelah pembayaran diverifikasi masuk, tekan tombol di bawah ini untuk melihat dan mencetak struk belanja.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTransferPopup(false);
+                  setShowReceipt(true);
+                }}
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-lg shadow-emerald-950/40"
+              >
+                Selesai & Cetak Struk
+              </button>
             </div>
           </div>
         </div>

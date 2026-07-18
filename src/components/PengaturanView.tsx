@@ -41,19 +41,19 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
   const [confirmPin, setConfirmPin] = useState('');
   const [resetError, setResetError] = useState('');
 
-  // Local Form state initialized from settings props
-  const [storeName, setStoreName] = useState(settings.storeName);
-  const [logoUrl, setLogoUrl] = useState(settings.logoUrl || '');
-  const [address, setAddress] = useState(settings.address);
-  const [phone, setPhone] = useState(settings.phone);
-  const [cashierName, setCashierName] = useState(settings.cashierName);
-  const [currency, setCurrency] = useState(settings.currency);
-  const [theme, setTheme] = useState<'light' | 'dark'>(settings.theme);
-  const [pin, setPin] = useState(settings.pin);
-  const [receiptFooter, setReceiptFooter] = useState(settings.receiptFooter);
+  // Local Form state initialized from settings props safely with string fallbacks
+  const [storeName, setStoreName] = useState(settings?.storeName || '');
+  const [logoUrl, setLogoUrl] = useState(settings?.logoUrl || '');
+  const [address, setAddress] = useState(settings?.address || '');
+  const [phone, setPhone] = useState(settings?.phone || '');
+  const [cashierName, setCashierName] = useState(settings?.cashierName || '');
+  const [currency, setCurrency] = useState(settings?.currency || 'Rp');
+  const [theme, setTheme] = useState<'light' | 'dark'>(settings?.theme || 'light');
+  const [pin, setPin] = useState(settings?.pin || '1234');
+  const [receiptFooter, setReceiptFooter] = useState(settings?.receiptFooter || '');
 
   // Local state for payment recipients
-  const [paymentRecipients, setPaymentRecipients] = useState<PaymentRecipient[]>(settings.paymentRecipients || []);
+  const [paymentRecipients, setPaymentRecipients] = useState<PaymentRecipient[]>(settings?.paymentRecipients || []);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newType, setNewType] = useState<'BANK' | 'E_WALLET'>('BANK');
   const [newProviderName, setNewProviderName] = useState('');
@@ -62,33 +62,98 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
 
   const [saving, setSaving] = useState(false);
 
-  const handleAddRecipient = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddRecipient = async (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault();
     if (!newProviderName.trim() || !newAccountNumber.trim() || !newAccountName.trim()) {
       alert('Harap lengkapi semua isian rekening!');
       return;
     }
     const item: PaymentRecipient = {
-      id: Date.now().toString(),
+      id: Math.random().toString(36).substring(2, 9) + '_' + Date.now(),
       type: newType,
       providerName: newProviderName.trim(),
       accountNumber: newAccountNumber.trim(),
       accountName: newAccountName.trim(),
       isActive: true,
     };
-    setPaymentRecipients([...paymentRecipients, item]);
+    const updatedList = [...paymentRecipients, item];
+    setPaymentRecipients(updatedList);
     setNewProviderName('');
     setNewAccountNumber('');
     setNewAccountName('');
     setShowAddForm(false);
+
+    const updatedSettings: StoreSettings = {
+      storeName: (storeName || '').trim(),
+      logoUrl: (logoUrl || '').trim(),
+      address: (address || '').trim(),
+      phone: (phone || '').trim(),
+      cashierName: (cashierName || '').trim(),
+      currency: (currency || '').trim() || 'Rp',
+      theme,
+      pin: (pin || '').trim() || '1234',
+      receiptFooter: (receiptFooter || '').trim(),
+      paymentRecipients: updatedList,
+    };
+
+    try {
+      await saveSettings(updatedSettings);
+      onUpdateSettings(updatedSettings);
+      alert('Rekening baru berhasil disimpan!');
+    } catch (err) {
+      console.error('Error saving payment recipient:', err);
+    }
   };
 
-  const handleToggleRecipient = (id: string) => {
-    setPaymentRecipients(prev => prev.map(item => item.id === id ? { ...item, isActive: !item.isActive } : item));
+  const handleToggleRecipient = async (id: string) => {
+    const updatedList = paymentRecipients.map(item => item.id === id ? { ...item, isActive: !item.isActive } : item);
+    setPaymentRecipients(updatedList);
+
+    const updatedSettings: StoreSettings = {
+      storeName: (storeName || '').trim(),
+      logoUrl: (logoUrl || '').trim(),
+      address: (address || '').trim(),
+      phone: (phone || '').trim(),
+      cashierName: (cashierName || '').trim(),
+      currency: (currency || '').trim() || 'Rp',
+      theme,
+      pin: (pin || '').trim() || '1234',
+      receiptFooter: (receiptFooter || '').trim(),
+      paymentRecipients: updatedList,
+    };
+
+    try {
+      await saveSettings(updatedSettings);
+      onUpdateSettings(updatedSettings);
+    } catch (err) {
+      console.error('Error toggling payment recipient:', err);
+    }
   };
 
-  const handleDeleteRecipient = (id: string) => {
-    setPaymentRecipients(prev => prev.filter(item => item.id !== id));
+  const handleDeleteRecipient = async (id: string) => {
+    const updatedList = paymentRecipients.filter(item => item.id !== id);
+    setPaymentRecipients(updatedList);
+
+    const updatedSettings: StoreSettings = {
+      storeName: (storeName || '').trim(),
+      logoUrl: (logoUrl || '').trim(),
+      address: (address || '').trim(),
+      phone: (phone || '').trim(),
+      cashierName: (cashierName || '').trim(),
+      currency: (currency || '').trim() || 'Rp',
+      theme,
+      pin: (pin || '').trim() || '1234',
+      receiptFooter: (receiptFooter || '').trim(),
+      paymentRecipients: updatedList,
+    };
+
+    try {
+      await saveSettings(updatedSettings);
+      onUpdateSettings(updatedSettings);
+      alert('Rekening berhasil dihapus!');
+    } catch (err) {
+      console.error('Error deleting payment recipient:', err);
+    }
   };
 
   // Instant visual theme propagation
@@ -105,15 +170,15 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
     setSaving(true);
     
     const updatedSettings: StoreSettings = {
-      storeName: storeName.trim(),
-      logoUrl: logoUrl.trim(),
-      address: address.trim(),
-      phone: phone.trim(),
-      cashierName: cashierName.trim(),
-      currency: currency.trim() || 'Rp',
+      storeName: (storeName || '').trim(),
+      logoUrl: (logoUrl || '').trim(),
+      address: (address || '').trim(),
+      phone: (phone || '').trim(),
+      cashierName: (cashierName || '').trim(),
+      currency: (currency || '').trim() || 'Rp',
       theme,
-      pin: pin.trim() || '1234',
-      receiptFooter: receiptFooter.trim(),
+      pin: (pin || '').trim() || '1234',
+      receiptFooter: (receiptFooter || '').trim(),
       paymentRecipients,
     };
 
