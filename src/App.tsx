@@ -111,42 +111,43 @@ export default function App() {
   // SPLASH SCREEN LOADING & BRANDING
   if (showSplash || !settings) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-between p-8 text-slate-100 font-sans select-none">
+      <div className="min-h-screen bg-gradient-to-tr from-[#001D39] to-[#0A4174] flex flex-col items-center justify-between p-8 text-white font-sans select-none relative overflow-hidden">
+        {/* Decorative background circle glows */}
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#7BBDE8]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#4E8EA2]/20 rounded-full blur-3xl animate-pulse" />
+        
         {/* Top Spacer */}
         <div />
-
+ 
         {/* Center Logo and Branding */}
-        <div className="flex flex-col items-center space-y-6 text-center">
+        <div className="flex flex-col items-center space-y-5 text-center relative z-10">
           <div className="relative">
-            {/* Outer ambient pulsing glow */}
-            <div className="absolute -inset-6 bg-emerald-500/20 rounded-full blur-2xl animate-pulse" />
-            
-            {/* Inner logo frame */}
-            <div className="relative inline-flex p-5 bg-gradient-to-tr from-emerald-950 to-slate-900 border-2 border-emerald-500/60 text-emerald-400 rounded-3xl shadow-2xl shadow-emerald-950/80 scale-110">
-              <Store className="w-10 h-10 animate-pulse" />
+            {/* Center Logo Card - mimicking FreshCart mockup */}
+            <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center shadow-[0_12px_40px_rgba(0,0,0,0.12)] scale-110 transition-all">
+              <Store className="w-12 h-12 text-[#0A4174]" />
             </div>
             
             {/* Tiny accent spark icon */}
-            <div className="absolute -top-1 -right-1 p-1 bg-emerald-500 text-slate-950 rounded-full shadow border-2 border-slate-950">
+            <div className="absolute -top-1 -right-1 p-1 bg-white text-[#0A4174] rounded-full shadow-lg border-2 border-[#0A4174]">
               <Sparkles className="w-3.5 h-3.5 fill-current animate-bounce" />
             </div>
           </div>
-
-          <div className="space-y-2 pt-2">
-            <h1 className="text-3xl font-black text-white tracking-wider uppercase">KasirPro POS</h1>
-            <p className="text-xs text-emerald-400 font-extrabold tracking-widest uppercase font-mono">Sistem Kasir Pintar & Modern</p>
+ 
+          <div className="space-y-1.5 pt-4">
+            <h1 className="text-3xl font-black text-white tracking-tight">KasirPro</h1>
+            <p className="text-[#7BBDE8] font-extrabold tracking-widest uppercase text-[10px]">Sistem Kasir Pintar & Modern</p>
           </div>
         </div>
-
+ 
         {/* Bottom loading status */}
-        <div className="flex flex-col items-center space-y-4 w-full max-w-xs">
-          <div className="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden border border-slate-850/60 p-[1px]">
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full animate-progress-bar" />
+        <div className="flex flex-col items-center space-y-4 w-full max-w-xs relative z-10">
+          <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden p-[1px]">
+            <div className="bg-white h-full rounded-full animate-progress-bar" />
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-            <p className="text-[9px] text-slate-400 font-extrabold tracking-widest uppercase font-mono">
+            <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <p className="text-[10px] text-slate-200 font-bold tracking-wider uppercase">
               {!settings ? 'Menghubungkan Database...' : 'Menyiapkan Aplikasi Kasir...'}
             </p>
           </div>
@@ -157,17 +158,24 @@ export default function App() {
 
   // RENDER PIN SECURITY GATE
   if (!isUnlocked) {
+    const isLight = settings.theme === 'light';
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6">
+      <div className={`min-h-screen flex flex-col items-center justify-center p-6 transition-colors duration-300 ${
+        isLight ? 'bg-slate-50 text-slate-900' : 'bg-slate-950 text-slate-100'
+      }`}>
         <div className="max-w-xs w-full text-center space-y-6">
           
           {/* Logo Brand */}
           <div className="space-y-2">
-            <div className="inline-flex p-3.5 bg-emerald-950/80 border border-emerald-800/40 text-emerald-400 rounded-2xl shadow-xl shadow-emerald-950/60">
+            <div className={`inline-flex p-4 rounded-3xl shadow-md transition-all ${
+              isLight 
+                ? 'bg-emerald-500 text-white shadow-md shadow-emerald-100' 
+                : 'bg-emerald-950/80 border border-emerald-800/40 text-emerald-400 shadow-md shadow-emerald-950/40'
+            }`}>
               <Store className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tight uppercase">KasirPro POS</h1>
-            <p className="text-xs text-slate-400">Masukkan PIN Keamanan untuk Membuka Kasir</p>
+            <h1 className={`text-2xl font-black tracking-tight uppercase mt-2 ${isLight ? 'text-slate-900' : 'text-white'}`}>KasirPro POS</h1>
+            <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Masukkan PIN Keamanan untuk Membuka Kasir</p>
           </div>
 
           {/* Dots Indicator */}
@@ -177,8 +185,12 @@ export default function App() {
                 key={idx}
                 className={`w-3.5 h-3.5 rounded-full border-2 transition-all duration-200 ${
                   idx < enteredPin.length
-                    ? 'bg-emerald-400 border-emerald-400 scale-125 shadow-md shadow-emerald-400/50'
-                    : 'bg-transparent border-slate-700'
+                    ? isLight 
+                      ? 'bg-emerald-500 border-emerald-500 scale-125 shadow-md shadow-emerald-300'
+                      : 'bg-emerald-400 border-emerald-400 scale-125 shadow-md shadow-emerald-400/50'
+                    : isLight
+                      ? 'bg-transparent border-slate-300'
+                      : 'bg-transparent border-slate-700'
                 }`}
               />
             ))}
@@ -186,7 +198,11 @@ export default function App() {
 
           {/* Error message */}
           {pinError && (
-            <div className="py-1.5 px-3 bg-red-950/40 border border-red-900/30 rounded-xl flex items-center justify-center gap-1.5 text-xs text-red-400 animate-pulse">
+            <div className={`py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs animate-pulse ${
+              isLight 
+                ? 'bg-red-50 border border-red-100 text-red-600' 
+                : 'bg-red-950/40 border border-red-900/30 text-red-400'
+            }`}>
               <ShieldAlert className="w-4 h-4" /> PIN salah! Harap coba kembali.
             </div>
           )}
@@ -197,33 +213,51 @@ export default function App() {
               <button
                 key={num}
                 onClick={() => handleNumpadPress(num)}
-                className="h-14 bg-slate-900 hover:bg-slate-850 text-xl font-extrabold text-slate-100 rounded-2xl border border-slate-850/60 active:scale-95 transition-all select-none cursor-pointer"
+                className={`h-14 text-xl font-extrabold rounded-2xl border active:scale-95 transition-all select-none cursor-pointer ${
+                  isLight
+                    ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200/60 shadow-sm'
+                    : 'bg-slate-900 hover:bg-slate-850 text-slate-100 border-slate-850/60'
+                }`}
               >
                 {num}
               </button>
             ))}
             <button
               onClick={handleNumpadClear}
-              className="h-14 bg-slate-950 hover:bg-slate-900 text-xs font-bold text-slate-500 rounded-2xl active:scale-95 transition-all select-none cursor-pointer"
+              className={`h-14 text-xs font-bold rounded-2xl active:scale-95 transition-all select-none cursor-pointer ${
+                isLight
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-500'
+                  : 'bg-slate-950 hover:bg-slate-900 text-slate-500'
+              }`}
             >
               C
             </button>
             <button
               onClick={() => handleNumpadPress('0')}
-              className="h-14 bg-slate-900 hover:bg-slate-850 text-xl font-extrabold text-slate-100 rounded-2xl border border-slate-850/60 active:scale-95 transition-all select-none cursor-pointer"
+              className={`h-14 text-xl font-extrabold rounded-2xl border active:scale-95 transition-all select-none cursor-pointer ${
+                isLight
+                  ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200/60 shadow-sm'
+                  : 'bg-slate-900 hover:bg-slate-850 text-slate-100 border-slate-850/60'
+              }`}
             >
               0
             </button>
             <button
               onClick={handleNumpadBackspace}
-              className="h-14 bg-slate-955 text-slate-400 hover:text-slate-200 rounded-2xl flex items-center justify-center active:scale-95 transition-all select-none cursor-pointer"
+              className={`h-14 rounded-2xl flex items-center justify-center active:scale-95 transition-all select-none cursor-pointer ${
+                isLight
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                  : 'bg-slate-950 hover:bg-slate-900 text-slate-400'
+              }`}
             >
               <Delete className="w-5 h-5" />
             </button>
           </div>
 
           {/* Lock status banner */}
-          <p className="text-[10px] text-slate-500 font-mono uppercase tracking-widest pt-2">
+          <p className={`text-[10px] font-mono uppercase tracking-widest pt-2 ${
+            isLight ? 'text-slate-400' : 'text-slate-500'
+          }`}>
             🔒 SECURED OFFLINE DIRECTORY
           </p>
         </div>
@@ -287,7 +321,7 @@ export default function App() {
 
       {/* Static persistent Bottom Mobile Navigation Panel */}
       {!isProductCrudOpen && (
-        <BottomNav currentTab={activeTab} setTab={handleTabChange} />
+        <BottomNav currentTab={activeTab} setTab={handleTabChange} theme={settings.theme} />
       )}
     </div>
   );

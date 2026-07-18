@@ -297,7 +297,7 @@ const DEFAULT_SETTINGS: StoreSettings = {
   phone: '081234567890',
   cashierName: 'Kasir Utama',
   currency: 'Rp',
-  theme: 'dark', // default theme
+  theme: 'light', // default theme
   pin: '1234',
   receiptFooter: 'Terima Kasih Atas Kunjungan Anda!',
   logoUrl: '',
