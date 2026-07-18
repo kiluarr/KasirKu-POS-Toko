@@ -165,16 +165,34 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
     });
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault();
+
+    if (!storeName.trim()) {
+      alert('Nama Toko harus diisi!');
+      return;
+    }
+    if (!address.trim()) {
+      alert('Alamat Toko harus diisi!');
+      return;
+    }
+    if (!phone.trim()) {
+      alert('No. WhatsApp Toko harus diisi!');
+      return;
+    }
+    if (!cashierName.trim()) {
+      alert('Nama Kasir harus diisi!');
+      return;
+    }
+
     setSaving(true);
     
     const updatedSettings: StoreSettings = {
-      storeName: (storeName || '').trim(),
+      storeName: storeName.trim(),
       logoUrl: (logoUrl || '').trim(),
-      address: (address || '').trim(),
-      phone: (phone || '').trim(),
-      cashierName: (cashierName || '').trim(),
+      address: address.trim(),
+      phone: phone.trim(),
+      cashierName: cashierName.trim(),
       currency: (currency || '').trim() || 'Rp',
       theme,
       pin: (pin || '').trim() || '1234',
@@ -333,7 +351,7 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
 
       {/* Main Settings Panel Forms scroll area */}
       <div className="flex-1 overflow-y-auto p-5">
-        <form onSubmit={handleSave} className="space-y-6 max-w-md mx-auto">
+        <div className="space-y-6 max-w-md mx-auto">
           
           {/* STORE PROFILE */}
           <div className="bg-slate-900/60 border border-slate-850 p-4 rounded-2xl space-y-4">
@@ -650,7 +668,8 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
 
           {/* Settings Save action */}
           <button
-            type="submit"
+            type="button"
+            onClick={handleSave}
             disabled={saving}
             className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer shadow-lg shadow-emerald-950/40 disabled:opacity-50"
           >
@@ -710,7 +729,7 @@ export default function PengaturanView({ settings, onUpdateSettings, onLock }: P
             </div>
           </div>
 
-        </form>
+        </div>
       </div>
 
       {/* Custom Database Reset Confirmation Modal Overlay */}
