@@ -377,11 +377,9 @@ export async function resetDatabase(): Promise<void> {
 
 // SEED INITIAL PRODUCTS IF EMPTY
 export async function seedInitialProductsIfEmpty(): Promise<void> {
-  // If the user explicitly reset the database, do not re-seed demo products
-  const blockSeed = fallbackStorage.getItem('kasirpro_block_seed') === 'true';
-  if (blockSeed) {
-    return;
-  }
+  // Dinonaktifkan: aplikasi harus selalu mulai kosong, tanpa data contoh
+  return;
+}
   
   const products = await getAllProducts();
   if (products.length > 0) return;
