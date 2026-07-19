@@ -380,68 +380,6 @@ export async function seedInitialProductsIfEmpty(): Promise<void> {
   // Dinonaktifkan: aplikasi harus selalu mulai kosong, tanpa data contoh
   return;
 }
-  
-  const products = await getAllProducts();
-  if (products.length > 0) return;
-
-  const initialProducts: Product[] = [
-    {
-      id: 'p1',
-      name: 'Kopi Susu Gula Aren',
-      sku: 'KOP-001',
-      barcode: '8991234560012',
-      category: 'Minuman',
-      costPrice: 8000,
-      sellingPrice: 18000,
-      stock: 50,
-    },
-    {
-      id: 'p2',
-      name: 'Roti Bakar Cokelat Keju',
-      sku: 'ROT-002',
-      barcode: '8991234560029',
-      category: 'Makanan',
-      costPrice: 10000,
-      sellingPrice: 22000,
-      stock: 30,
-    },
-    {
-      id: 'p3',
-      name: 'Ice Green Tea Latte',
-      sku: 'GTE-003',
-      barcode: '8991234560036',
-      category: 'Minuman',
-      costPrice: 9000,
-      sellingPrice: 20000,
-      stock: 40,
-    },
-    {
-      id: 'p4',
-      name: 'Kentang Goreng Krispi',
-      sku: 'FFR-004',
-      barcode: '8991234560043',
-      category: 'Camilan',
-      costPrice: 7000,
-      sellingPrice: 15000,
-      stock: 8, // Low stock on purpose to trigger low stock alerts!
-    },
-    {
-      id: 'p5',
-      name: 'Nasi Goreng Spesial',
-      sku: 'NAS-005',
-      barcode: '8991234560050',
-      category: 'Makanan',
-      costPrice: 12000,
-      sellingPrice: 25000,
-      stock: 25,
-    },
-  ];
-
-  for (const product of initialProducts) {
-    await saveProduct(product);
-  }
-}
-
 // EXPENSES API
 export async function getAllExpenses(): Promise<Expense[]> {
   if (useFallback) {
